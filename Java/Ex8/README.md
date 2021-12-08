@@ -1,2 +1,2 @@
-#Ex8
+# Ex8
 8th java assignment from college - year 1 semester 2
