@@ -1,2 +1,2 @@
 # Java
-A folder of all my java projects from college
+A folder of all my java assignments from college
