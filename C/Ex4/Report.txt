@@ -1,0 +1,13 @@
+========================================================================
+Number of Students included in the grades file:           	0
+Number of students that took part in only one test period:	0
+Number of students that didnt take part in any exam:      	0
+========================================================================
+Percentage of failures in the first term of the exam:     	0.00%
+Percentage of failures in the second term of the exam:    	0.00%
+Avarage grade in the first term of the exam:              	0
+Avarage grade in the second term of the exam:             	0
+========================================================================
+The student who got the highest grade in the entire exam: 	0
+The student who got the lowest grade in the entire exam:  	0
+========================================================================
