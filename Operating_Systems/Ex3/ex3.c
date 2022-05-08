@@ -9,6 +9,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <wait.h>
+#include <sys/stat.h> 
+#include <fcntl.h>
 
 #define true 1
 #define false 0
@@ -16,6 +18,7 @@
 #define MAX_PIPES 2     //determines the number of pipes alowed
 
 char* fileName = "file.txt";    //name of history file
+char* nohupFileName = "nohup.txt";
 int pipeCount;
 int runInBackground;
 
@@ -39,7 +42,8 @@ int checkLineCommand(char*);            //recives the [line] of the last command
 int checkPipe(char**, int);             //recives argv and its length
 int runPipe(char**, int, int);          //recives double array to run, index of the pipe, index of first command and the length of the array.
 int countPipes(char**);                 //recives double array to check
-void checkBackground(char*);            //recives line to check for '&' nad words count to decrease if necessary
+void checkBackground(char*);            //recives [line] to check for '&' nad words count to decrease if necessary
+void checkNohup(char**);                //recives double array to check
 int translate(char*);                   //recives command line to translate
 
 //============================ M A I N ============================
@@ -117,8 +121,10 @@ void run() {
 
         // for(int i = 0; argv[i] != NULL; i++) printf("%s\n", argv[i]);
         
+        int tempPipes = pipeCount;
         pipeCount = 0;
         int status = checkPipe(argv, argvLen);
+        pipeCount = tempPipes;
 
         if(pipeCount == 0)
             status = runCommand(argv);
@@ -290,6 +296,23 @@ void checkBackground(char* line) {
     }
 }
 
+//checks for 'nohup' command and manages the process if found
+void checkNohup(char** argv) {
+    if(strcmp(argv[0], "nohup") == 0) {
+        signal(SIGHUP, SIG_IGN);
+        close(STDIN_FILENO);
+        int fd = open(nohupFileName, O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+        if(dup2(fd, STDOUT_FILENO) == -1) {
+            fprintf(stderr, "dup2() failed\n");
+            freeArgv(argv);
+            exit(1);
+        }
+        free(argv[0]);
+        for(int i = 0; argv[i] != NULL; i++)
+            argv[i] = argv[i + 1];
+    }
+}
+
 //free dynamic memory
 void freeArgv(char** argv) {
     if(argv == NULL) return;
@@ -320,6 +343,7 @@ int runCommand(char** argv) {
         exit(1);
     }
     if(pd == 0) {
+        checkNohup(argv);
         //executes the command entered by the user in the child process
         if(execvp(argv[0], argv) == -1) {
             perror("execvp() failed");
@@ -444,6 +468,8 @@ int runPipe(char** argv, int pipeIndex, int length) {
             strcpy(newArgv[i], argv[pipeIndex + 1 + i]);
             newArgv[i+1] = NULL;
         }
+        
+        checkNohup(newArgv);
 
         if(newSize == 1) {
             if(checkHistory(newArgv[0]) == 0) {
