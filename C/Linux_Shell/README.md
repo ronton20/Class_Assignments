@@ -17,26 +17,26 @@ added support for 'nohup' commands <br />
 <br />
 <br />
 ==main functions==<br />
-1.run 		    - this method receive a file name and runs in an infinite loop untill "done" is recived. it counts the words and chars of the inputted sentence and sends said sentence to the "writeHistory" function. <br />
-2.writeHistory 	    - opens an append file and adds the given sentence to the end of the file. closes the file when done. <br />
-3.printHistory 	    - opens a read file and prints the entire content of the given file name. closes the file when done. <br />
-4.getWordsNChars    - counts the words and chars in a given line and *adds* the amount to the given integer pointers <br />
-5.toDoubleArr 	    - takes a line of text and turns it to an array of words <br />
-6.freeArgv 	    - free dynamic memory <br />
-7.runCommand 	    - runs a comman in a child process and returns the childs exit status <br />
-8.getCleanWord 	    - puts a clean version (no spaces and puts '\0' at the end) of [line] in [newLine] <br />
-9.checkDone 	    - check for 'done' command and executes its purpose if entered <br />
-10.checkHistory     - check for 'history' command and executes its purpose if entered <br />
-11.checkLineCommand - check for '![num]' command and executes its purpose if entered <br />
-12.checkPipe 	    - checking for pipe <br />
-13.runPipe 	    - runs a command with pipe <br />
-14.countPipes 	    - counts the number of pipes <br />
-15.checkBackground  - checks for '&' and removes it from [line] <br />
-16.checkNohup 	    - checks for 'nohup' command and manages the process if found <br />
-17.checkEcho 	    - checks if there is an echo command and updates to location of the following quotes <br />
-18.translate 	    - translates a command line to the appropriate corresponding commands in case it contains '![num]' commands in it <br />
- <br />
- <br />
+
+1. run - this method receive a file name and runs in an infinite loop untill "done" is recived. it counts the words and chars of the inputted sentence and sends said sentence to the "writeHistory" function.
+2. writeHistory - opens an append file and adds the given sentence to the end of the file. closes the file when done.
+3. printHistory - opens a read file and prints the entire content of the given file name. closes the file when done.
+4. getWordsNChars - counts the words and chars in a given line and *adds* the amount to the given integer pointers
+5. toDoubleArr - takes a line of text and turns it to an array of words
+6. freeArgv - free dynamic memory
+7. runCommand - runs a comman in a child process and returns the childs exit status
+8. getCleanWord - puts a clean version (no spaces and puts '\0' at the end) of [line] in [newLine] 
+9. checkDone - check for 'done' command and executes its purpose if entered
+10. checkHistory - check for 'history' command and executes its purpose if entered
+11. checkLineCommand - check for '![num]' command and executes its purpose if entered 
+12. checkPipe - checking for pipe 
+13. runPipe - runs a command with pipe
+14. countPipes - counts the number of pipes
+15. checkBackground - checks for '&' and removes it from [line]
+16. checkNohup - checks for 'nohup' command and manages the process if found 
+17. checkEcho - checks if there is an echo command and updates to location of the following quotes
+18. translate - translates a command line to the appropriate corresponding commands in case it contains '![num]' commands in it 
+
 ==Program Files== <br />
 ex3.c - runs a 'linux shell' that implements all the available linux shell commands (except [cd]). <br />
  <br />
