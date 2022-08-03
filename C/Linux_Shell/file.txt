@@ -1,0 +1,162 @@
+ls -l
+ls -l
+ls -l
+ls -l
+ls -l | wc -l
+ls -l | sort | wc -l
+cat file.txt | sort | head 5
+cat file.txt | sort | head-5
+cat file.txt | sort | cat
+cat file.txt | sort | cat | sort
+cat file.txt | sort | cat | sort | cat
+cat file.txt | cat | sort | cat
+cat file.txt | sort | cat | sort | cat
+exit
+ls -l
+ls -l | wc -l
+ls -l | wc -l
+ls
+ls | wc -l
+pwd | wc -l
+pwd
+ls -l | wc -l
+ls -l | wc -l
+pwd
+ls -l
+ls -l
+ls il | wc -l
+ls -l | wc -l
+ls -l| wc -l
+ls -l | wc -l
+ls -l
+ls -l | wc -l
+ls -l | wc
+ls -l
+ls -l | wc
+ls -l
+ls -l | wc
+ls -l | wc -l
+ls -l | wc
+ls -l | wc
+ls
+ls -l
+ls
+history
+ls
+ls | wc
+ls | wc
+ls -l
+ls
+ls
+ls | wc
+history
+ls
+ls | cat | wc
+history
+ls | wc
+ls
+ls | wc
+ls
+ls | wc
+ls | wc
+ls | wc
+ls | wc
+
+ls | wc
+
+ls
+ls | cat | wc
+ls | sort | cat | wc
+history
+ls | wc
+ls | sort | cat | wc
+ls | sort | cat | wc
+history
+ls | wc
+history
+ls | sort | cat | wc
+ls
+ls | wc
+ls | sort | cat | sort
+ls | sort | wc
+cat | sort
+�	�i�����ls
+ls | wc
+ls | sort | wc
+ls
+ls | wc
+ls | cat | wc
+ls | sort | cat | wc
+ls
+ls | wc
+ls | cat | wc
+sleep 5
+sleep 5ps
+ps
+sleep 5sleep 5ps
+sleep 5ps
+ls -l | wcps
+sleep 5 | ls -lps
+sleep 5 | ls -l | wcps
+
+ls -l
+sleep 5
+history
+sleep 5
+ps
+ls | cat | wc
+history
+ls -l
+ls -l
+ls -l | sort
+history
+history
+ls -l
+ | wc
+ls -l
+ | wc
+ls -l | wc
+history
+history
+history | wc
+history
+history
+history | wc
+history
+history | wc | cat
+history
+history | wc | sort
+history
+history | sort
+history
+history
+history | sort | wc
+history
+history | sort | wc
+history
+history | sort
+history
+history
+history | sort
+history
+history | sort | wc
+history
+history | sort | wc
+history
+history
+history
+history
+history | sort | wc
+history
+history | sort
+history
+history | sort | wc
+history
+history | sort | wc
+ls -l
+ls -l | sort | wc
+nohup sleep 20
+ps
+sleep 15
+ps
+echo "hello | wc"
