@@ -1,11 +1,11 @@
-#HTTP Client
+# HTTP Client
 
-###Author: Ron Amar
+### Author: Ron Amar
 
 Submitted Files:
 client.c - contains the code for the HTTP client
 
-###==================== Remarks ====================
+### ==================== Remarks ====================
 
 The client uses the HTTP/1.0 protocol.
 The client can handle URLs with and without a port number. If no port number is given, the default port (80) is used.
@@ -15,7 +15,7 @@ Additional feature: The client can handle URLs with arguments, such as "http://w
 
 Pay Attention: in case the port given is not correct/not the default the connect() function will get stuck in an infinite loop (sometimes exit through connection error).
 
-###==================== About the Code ====================
+### ==================== About the Code ====================
 The code for the HTTP client is written in C and uses the standard libraries stdio.h, stdlib.h, string.h, netinet/in.h, netdb.h, and unistd.h. It includes the following main functions:
 
 getType: checks for the type of argument (URL, GET or POST) and returns 'u' for URL, 'p' for -p, 'r' for -r, or 0 for none of the above.
@@ -27,7 +27,7 @@ The code also includes helper functions for parsing arguments, checking if a str
 
 Overall, the code is designed to be simple and efficient, allowing the user to easily send HTTP requests to a server and receive the response.
 
-###==================== Usage ====================
+### ==================== Usage ====================
 To use the client, compile the code with a C compiler and run the executable with the following arguments:
 ./client [-p n <text>] [-r n < pr1=value1 pr2=value2 ...>] <URL>
 
