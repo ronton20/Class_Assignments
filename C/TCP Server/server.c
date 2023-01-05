@@ -6,7 +6,7 @@
 #include <netinet/in.h>
 #include <sys/stat.h>
 #include <dirent.h>
-#include <sys/sendfile.h>
+// #include <sys/sendfile.h>
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <signal.h>
@@ -299,7 +299,7 @@ void respondFile(int fd, char* file_path) {
         sprintf(header, "HTTP/1.0 200 OK\r\n"
                         "Server: webserver/1.0\r\n"
                         "Date: %s\r\n"
-                        "Content-Length: %ld\r\n"
+                        "Content-Length: %lld\r\n"
                         "Last-Modified: %s\r\n"
                         "Connection: close\r\n\r\n",
                         curr_time, path.st_size, file_time);
@@ -308,7 +308,7 @@ void respondFile(int fd, char* file_path) {
                         "Server: webserver/1.0\r\n"
                         "Date: %s\r\n"
                         "Content-Type: %s\r\n"
-                        "Content-Length: %ld\r\n"
+                        "Content-Length: %lld\r\n"
                         "Last-Modified: %s\r\n"
                         "Connection: close\r\n\r\n",
                         curr_time, file_type, path.st_size, file_time);
@@ -408,7 +408,7 @@ void respondDirectory(int fd, char* dir_path) {
                 // Get file size - only if it's a regular file
                 char size[STR_SIZE] = "";
                 if(S_ISREG(path.st_mode))
-                    sprintf(size, "%ld", path.st_size);
+                    sprintf(size, "%lld", path.st_size);
 
                 // Add entry to body
                 strcat(body, "<tr>\r\n<td><A HREF=\"");
