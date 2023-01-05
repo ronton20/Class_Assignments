@@ -6,7 +6,6 @@
 #include <netinet/in.h>
 #include <sys/stat.h>
 #include <dirent.h>
-// #include <sys/sendfile.h>
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <signal.h>
@@ -299,7 +298,7 @@ void respondFile(int fd, char* file_path) {
         sprintf(header, "HTTP/1.0 200 OK\r\n"
                         "Server: webserver/1.0\r\n"
                         "Date: %s\r\n"
-                        "Content-Length: %lld\r\n"
+                        "Content-Length: %ld\r\n"
                         "Last-Modified: %s\r\n"
                         "Connection: close\r\n\r\n",
                         curr_time, path.st_size, file_time);
@@ -308,7 +307,7 @@ void respondFile(int fd, char* file_path) {
                         "Server: webserver/1.0\r\n"
                         "Date: %s\r\n"
                         "Content-Type: %s\r\n"
-                        "Content-Length: %lld\r\n"
+                        "Content-Length: %ld\r\n"
                         "Last-Modified: %s\r\n"
                         "Connection: close\r\n\r\n",
                         curr_time, file_type, path.st_size, file_time);
@@ -319,7 +318,7 @@ void respondFile(int fd, char* file_path) {
         perror("write() failed");
         return;
     }
-    printf("Thread %ld:\nSent header:\n%s\nTo client fd: %d\n\n", pthread_self(), header, fd);
+    // printf("Thread %ld:\nSent header:\n%s\nTo client fd: %d\n\n", pthread_self(), header, fd);
     // Open file
     FILE* readFile = fopen(file_path, "r");
     if(readFile < 0) {
@@ -327,22 +326,32 @@ void respondFile(int fd, char* file_path) {
         return;
     }
     // Read file and send it to the client
-    unsigned char buf[BUF_SIZE * 10] = {0};
+
+    /* GENERAL WAY TO SEND FILE - WORKS WITH *MOST* BROWSERS */
+    // Change fread buffer size to: sizeof(buf)
+    // unsigne char buf[BUF_SIZE] = "";
+
+    /* FIX FOR CHROME SIGPIPE */
+    // Change fread buffer size to: path.st_size
+    unsigned char* buf = (unsigned char*)malloc(sizeof(unsigned char) * path.st_size);
+    
     int bytes_read;
     // printf("Thread %ld: Sending file %s\nFrom file fd: %d\nTo client fd: %d\n", pthread_self(), file_path, fileno(readFile), fd);
-    while((bytes_read = fread(buf, 1, sizeof(buf), readFile)) > 0) {
+    while((bytes_read = fread(buf, 1, path.st_size, readFile)) > 0) {
         // printf("Thread %ld: Read %d bytes from file %s\n", pthread_self(), bytes_read, file_path);
         ssize_t bytes_written;
+        
         if((bytes_written = write(fd, buf, bytes_read)) < 0) {
             perror("write() failed");
             fclose(readFile);
+            free(buf);
             return;
         }
         // printf("Thread %ld: Wrote %ld bytes to client\n", pthread_self(), bytes_written);
     }
     // printf("Thread %ld: Done sending file %s\nFrom file fd: %d\nTo client fd: %d\n", pthread_self(), file_path, fileno(readFile), fd);
     fclose(readFile);
-    
+    free(buf);
 }
 
 // Responds to the client in case its a directory
@@ -408,7 +417,7 @@ void respondDirectory(int fd, char* dir_path) {
                 // Get file size - only if it's a regular file
                 char size[STR_SIZE] = "";
                 if(S_ISREG(path.st_mode))
-                    sprintf(size, "%lld", path.st_size);
+                    sprintf(size, "%ld", path.st_size);
 
                 // Add entry to body
                 strcat(body, "<tr>\r\n<td><A HREF=\"");
@@ -546,6 +555,7 @@ void* check_request(void* _fd) {
 // ============================== M A I N ==============================
 int main(int argc, char const *argv[])
 {
+    /* BRUTAL WAY TO FIX CHROME SIGPIPE */
     // signal(SIGPIPE, SIG_IGN);   // Ignore SIGPIPE
 
     // Making sure we got 3 arguments as needed
