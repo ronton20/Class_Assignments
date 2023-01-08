@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <signal.h>
+#include <sys/sendfile.h>
 
 
 #define RFC1123FMT "%a, %d %b %Y %H:%M:%S GMT"
@@ -18,7 +19,7 @@
 #define STR_SIZE 64
 
 // Returns the current time in GMT format
-void getTime(char* timebuf, size_t size) {
+    void getTime(char* timebuf, size_t size) {
     if(timebuf == NULL) return;
     time_t now = time(NULL);
     strftime(timebuf, size, RFC1123FMT, gmtime(&now));
@@ -290,6 +291,7 @@ void respondFile(int fd, char* file_path) {
     char file_time[TIME_BUF_SIZE];
     if(strftime(file_time, sizeof(file_time), RFC1123FMT, localtime(&path.st_mtime)) < 0) {
         perror("strftime() failed");
+        returnError(fd, 500, NULL); // Internal server error
         return;
     }
     // Create header
@@ -316,6 +318,7 @@ void respondFile(int fd, char* file_path) {
     // Send header
     if(write(fd, header, strlen(header)) < 0) {
         perror("write() failed");
+        returnError(fd, 500, NULL); // Internal server error
         return;
     }
     // printf("Thread %ld:\nSent header:\n%s\nTo client fd: %d\n\n", pthread_self(), header, fd);
@@ -323,18 +326,22 @@ void respondFile(int fd, char* file_path) {
     FILE* readFile = fopen(file_path, "r");
     if(readFile < 0) {
         perror("fopen() failed");
+        returnError(fd, 500, NULL); // Internal server error
         return;
     }
     // Read file and send it to the client
 
     /* GENERAL WAY TO SEND FILE - WORKS WITH *MOST* BROWSERS */
     // Change fread buffer size to: sizeof(buf)
-    // unsigne char buf[BUF_SIZE] = "";
+    // unsigned char buf[BUF_SIZE] = "";
 
     /* FIX FOR CHROME SIGPIPE */
     // Change fread buffer size to: path.st_size
     unsigned char* buf = (unsigned char*)malloc(sizeof(unsigned char) * path.st_size);
     
+    // Send using sendFile()
+    // sendfile(fd, fileno(readFile), NULL, path.st_size);
+
     int bytes_read;
     // printf("Thread %ld: Sending file %s\nFrom file fd: %d\nTo client fd: %d\n", pthread_self(), file_path, fileno(readFile), fd);
     while((bytes_read = fread(buf, 1, path.st_size, readFile)) > 0) {
@@ -388,8 +395,6 @@ void respondDirectory(int fd, char* dir_path) {
         if (d) {
             // Read entries in directory
             while ((dir = readdir(d)) != NULL) {
-                // Skip "." and ".."
-                // if (strcmp(dir->d_name, ".") == 0 || strcmp(dir->d_name, "..") == 0) continue;
 
                 body = (char*)realloc(body, (strlen(body) + BUF_SIZE) * sizeof(char));
 
@@ -402,6 +407,7 @@ void respondDirectory(int fd, char* dir_path) {
                 if(stat(file_path, &path) == -1) {
                     perror("stat() failed");
                     free(body);
+                    returnError(fd, 500, NULL); // Internal server error
                     return;
                 }
 
@@ -411,6 +417,7 @@ void respondDirectory(int fd, char* dir_path) {
                 if(strftime(time, sizeof(time), RFC1123FMT, localtime(&path.st_mtime)) < 0) {
                     perror("strftime() failed");
                     free(body);
+                    returnError(fd, 500, NULL); // Internal server error
                     return;
                 }
 
@@ -437,7 +444,7 @@ void respondDirectory(int fd, char* dir_path) {
             strcat(body, "</table>\r\n\r\n");
             strcat(body, "<HR>\r\n\r\n");
             strcat(body, "<ADDRESS>webserver/1.0</ADDRESS>\r\n\r\n");
-            strcat(body, "</BODY></HTML>\r\n\r\n");
+            strcat(body, "</BODY></HTML>");
 
             char time[TIME_BUF_SIZE] = "";
             getTime(time, sizeof(time));
@@ -528,6 +535,7 @@ void* check_request(void* _fd) {
     while(1) {
         if((nbytes = read(fd, buf, sizeof(buf) - sizeof(char))) < 0) {
             perror("read() failed");
+            returnError(fd, 500, NULL); // Internal server error
             return NULL;
         }
         buf[sizeof(buf) - sizeof(char)] = 0;
@@ -540,7 +548,7 @@ void* check_request(void* _fd) {
         strcat(request, buf);
     }
 
-    printf("Request: %s\n", request);
+    // printf("Request: %s\n", request);
 
     // Check input and split to argv
     char** argv = splitstr(request, " ", 3);
@@ -608,7 +616,7 @@ int main(int argc, char const *argv[])
 
     // Loop
     for(int i = 0; i < max_requests; i++) {
-        // Accept=
+        // Accept
         int newsd = accept(sd, NULL, NULL);
         if(newsd < 0) {
             perror("accept() failed");

@@ -132,14 +132,8 @@ void dispatch(threadpool* from_me, dispatch_fn dispatch_to_here, void *arg) {
         exit(EXIT_FAILURE);
     }
     // Mutex is ours
-    int dontAccept = from_me->dont_accept;
-    // Free the mutex
-    if(pthread_mutex_unlock(&(from_me->qlock)) != 0) {
-        perror("pthread_mutex_unlock() failed\n");
-        exit(EXIT_FAILURE);
-    }
     // Check if we can accept more work
-    if(dontAccept == 1) return;
+    if(from_me->dont_accept == 1) return;
     // Create new work
     work_t* work = (work_t*)malloc(sizeof(work_t));
     if(work == NULL) {
@@ -151,11 +145,6 @@ void dispatch(threadpool* from_me, dispatch_fn dispatch_to_here, void *arg) {
     work->arg = arg;
     work->next = NULL;
 
-    // Waiting for mutex to free again
-    if(pthread_mutex_lock(&(from_me->qlock)) != 0) {
-        perror("pthread_mutex_lock() failed\n");
-        exit(EXIT_FAILURE);
-    }
     // Add the work to the queue
     if(from_me->qhead == NULL) {
         from_me->qhead = work;
@@ -164,14 +153,14 @@ void dispatch(threadpool* from_me, dispatch_fn dispatch_to_here, void *arg) {
     }
     from_me->qtail = work;
     from_me->qsize += 1;
-    // Signal a sleeping thread that there is work to be done
-    if(pthread_cond_signal(&(from_me->q_not_empty)) != 0) {
-        perror("pthread_cond_signal() failed\n");
-        exit(EXIT_FAILURE);
-    }
     // Free the mutex
     if(pthread_mutex_unlock(&(from_me->qlock)) != 0) {
         perror("pthread_mutex_unlock() failed\n");
+        exit(EXIT_FAILURE);
+    }
+    // Signal a sleeping thread that there is work to be done
+    if(pthread_cond_signal(&(from_me->q_not_empty)) != 0) {
+        perror("pthread_cond_signal() failed\n");
         exit(EXIT_FAILURE);
     }
 }
