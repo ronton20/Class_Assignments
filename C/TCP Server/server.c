@@ -538,6 +538,7 @@ void* check_request(void* _fd) {
             returnError(fd, 500, NULL); // Internal server error
             return NULL;
         }
+        if(nbytes == 0) return NULL;
         buf[sizeof(buf) - sizeof(char)] = 0;
         char* end = strstr(buf, "\r\n");
         if(end != NULL) {
