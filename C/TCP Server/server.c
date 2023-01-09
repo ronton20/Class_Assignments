@@ -9,7 +9,6 @@
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <signal.h>
-// #include <sys/sendfile.h>
 
 
 #define RFC1123FMT "%a, %d %b %Y %H:%M:%S GMT"
@@ -330,30 +329,15 @@ void respondFile(int fd, char* file_path) {
     // Change fread buffer size to: sizeof(buf)
     unsigned char buf[BUF_SIZE] = "";
 
-    /* FIX FOR CHROME SIGPIPE */
-    // Change fread buffer size to: path.st_size
-    // unsigned char* buf = (unsigned char*)malloc(sizeof(unsigned char) * path.st_size);
-    
-    // Send using sendFile()
-    // sendfile(fd, fileno(readFile), NULL, path.st_size);
-
     int bytes_read;
-    // printf("Thread %ld: Sending file %s\nFrom file fd: %d\nTo client fd: %d\n", pthread_self(), file_path, fileno(readFile), fd);
     while((bytes_read = fread(buf, 1, sizeof(buf), readFile)) > 0) {
-        // printf("Thread %ld: Read %d bytes from file %s\n", pthread_self(), bytes_read, file_path);
-        ssize_t bytes_written;
-        
-        if((bytes_written = write(fd, buf, bytes_read)) < 0) {
+        if(write(fd, buf, bytes_read) < 0) {
             perror("write() failed");
             fclose(readFile);
-            // free(buf);
             return;
         }
-        // printf("Thread %ld: Wrote %ld bytes to client\n", pthread_self(), bytes_written);
     }
-    // printf("Thread %ld: Done sending file %s\nFrom file fd: %d\nTo client fd: %d\n", pthread_self(), file_path, fileno(readFile), fd);
     fclose(readFile);
-    // free(buf);
 }
 
 // Responds to the client in case its a directory
@@ -432,7 +416,7 @@ void respondDirectory(int fd, char* dir_path) {
                 strcat(body, time);
                 strcat(body, "</td>\r\n<td>");
                 strcat(body, size);
-                strcat(body, "</td></td>\r\n\r\n");
+                strcat(body, "</td></tr>\r\n\r\n");
                 
             }
             // Finish body
