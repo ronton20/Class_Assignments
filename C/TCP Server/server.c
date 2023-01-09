@@ -251,7 +251,7 @@ int checkPathPermissions(char* path) {
         next_path++;
     }
 
-    // Check the permissions of the file
+    // Check if the final component has read permissions
     ret = stat(path, &st);
     if (ret != 0) {
         perror("stat() failed");
@@ -277,11 +277,6 @@ void respondFile(int fd, char* file_path) {
         returnError(fd, 404, NULL);
         return;
     }
-    // Check path permissions
-    if(checkPathPermissions(file_path) == -1) {
-        returnError(fd, 403, NULL);
-        return;
-    }
     // Get current time
     char curr_time[TIME_BUF_SIZE] = "";
     getTime(curr_time, sizeof(curr_time));
@@ -300,7 +295,7 @@ void respondFile(int fd, char* file_path) {
         sprintf(header, "HTTP/1.0 200 OK\r\n"
                         "Server: webserver/1.0\r\n"
                         "Date: %s\r\n"
-                        "Content-Length: %lld\r\n"
+                        "Content-Length: %ld\r\n"
                         "Last-Modified: %s\r\n"
                         "Connection: close\r\n\r\n",
                         curr_time, path.st_size, file_time);
@@ -309,7 +304,7 @@ void respondFile(int fd, char* file_path) {
                         "Server: webserver/1.0\r\n"
                         "Date: %s\r\n"
                         "Content-Type: %s\r\n"
-                        "Content-Length: %lld\r\n"
+                        "Content-Length: %ld\r\n"
                         "Last-Modified: %s\r\n"
                         "Connection: close\r\n\r\n",
                         curr_time, file_type, path.st_size, file_time);
@@ -424,7 +419,7 @@ void respondDirectory(int fd, char* dir_path) {
                 // Get file size - only if it's a regular file
                 char size[STR_SIZE] = "";
                 if(S_ISREG(path.st_mode))
-                    sprintf(size, "%lld", path.st_size);
+                    sprintf(size, "%ld", path.st_size);
 
                 // Add entry to body
                 strcat(body, "<tr>\r\n<td><A HREF=\"");
@@ -506,6 +501,11 @@ void handle_request(int fd, char** argv) {
     struct stat path;
     if(stat(newPath, &path) == -1) {
         returnError(fd, 404, NULL); // Not found
+        return;
+    }
+    // Check path permissions
+    if(checkPathPermissions(newPath) == -1) {
+        returnError(fd, 403, NULL);
         return;
     }
     if(S_ISDIR(path.st_mode)) {
