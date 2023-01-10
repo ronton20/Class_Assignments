@@ -28,7 +28,7 @@ Overall, the code is designed to be secure and efficient, allowing the server to
 ## Usage
 To use the server, compile the code with a C compiler and run the executable with the following arguments:
 ```C
-./server <port-number> <pool-size> <max-number-of-request>```
+./server <port-number> <pool-size> <max-number-of-request> ```
 
 - `port-number`: the port number to run the server on. This argument is required.
 - `pool-size`: the size of the threadpool. This argument is required.
