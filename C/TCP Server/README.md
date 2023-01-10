@@ -1,5 +1,5 @@
 # TCP Server
-### Author: Ron Amar
+Author: Ron Amar
 
 ## Submitted Files
 - `server.c` - contains the code for the TCP server
