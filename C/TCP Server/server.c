@@ -276,6 +276,10 @@ void respondFile(int fd, char* file_path) {
         returnError(fd, 404, NULL);
         return;
     }
+    if(checkPathPermissions(file_path) == -1) {
+        returnError(fd, 403, NULL);
+        return;
+    }
     // Get current time
     char curr_time[TIME_BUF_SIZE] = "";
     getTime(curr_time, sizeof(curr_time));
@@ -342,13 +346,20 @@ void respondFile(int fd, char* file_path) {
 
 // Responds to the client in case its a directory
 void respondDirectory(int fd, char* dir_path) {
-    char newPath[BUF_SIZE] = "";
-    strcat(newPath, dir_path + 1);
-    strcat(newPath, "index.html");
+    char newPath[BUF_SIZE] = ".";
+    strcat(newPath, dir_path);
+    // Check path permissions
+    if(checkPathPermissions(newPath) == -1) {
+        returnError(fd, 403, NULL);
+        return;
+    }
+    char indexPath[BUF_SIZE] = "";
+    strcat(indexPath, newPath);
+    strcat(indexPath, "index.html");
     struct stat path;
     // Check if index.html exists in this dir
-    if(stat(newPath, &path) == 0) {
-        respondFile(fd, newPath);
+    if(stat(indexPath, &path) == 0) {
+        respondFile(fd, indexPath);
         return;
     } else {
         // Create response body
@@ -365,7 +376,7 @@ void respondDirectory(int fd, char* dir_path) {
         DIR *d;
         struct dirent *dir;
         char dir_name[BUF_SIZE] = ".";  // current directory
-        if (dir_path[1] != '\0') {
+        if (strcmp(dir_path, "/") != 0) {
             strcat(dir_name, dir_path);
         }
 
@@ -485,11 +496,6 @@ void handle_request(int fd, char** argv) {
     struct stat path;
     if(stat(newPath, &path) == -1) {
         returnError(fd, 404, NULL); // Not found
-        return;
-    }
-    // Check path permissions
-    if(checkPathPermissions(newPath) == -1) {
-        returnError(fd, 403, NULL);
         return;
     }
     if(S_ISDIR(path.st_mode)) {
