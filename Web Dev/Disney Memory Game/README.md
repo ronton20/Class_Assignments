@@ -1,7 +1,5 @@
 # Disney Memory Game
-
--   Author: Ron Ariel
--   ID: 318479458
+### Author: Ron Ariel
 
 This is a web-based Memory Game that uses the Disney API to get a list of random characters. The game is designed for users to match the pairs of characters displayed on the cards.
 
