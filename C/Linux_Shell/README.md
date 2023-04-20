@@ -37,7 +37,7 @@ were in those commands (only the valid commands count), then the program stops.<
 18. `translate` - translates a command line to the appropriate corresponding commands in case it contains '![num]' commands in it 
 
 ## Program Files
-- `ex3.c` - runs a 'linux shell' that implements all the available linux shell commands (except [cd]).
+- `ex3.c` - runs a `linux shell` that implements all the available linux shell commands (except `cd`).
 
 ## How to compile
 compile:
